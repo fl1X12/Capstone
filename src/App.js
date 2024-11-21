@@ -1,23 +1,67 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useRef, useState, useEffect } from 'react';
+
+import GetTest from './comp1';
+import PostTest from './comp2';
 
 function App() {
+  const URLref = useRef();
+  const endpointref = useRef();
+  const [url, setUrl] = useState("");
+  const [endpoint, setEndpoint] = useState("");
+  const [params, setParams] = useState({});
+  const [requestType, setRequestType] = useState("GET"); // New state for request type
+
+  const handleRequest = (event) => {
+    event.preventDefault();
+    setUrl(URLref.current.value);
+    setEndpoint(endpointref.current.value);
+  };
+
+  useEffect(() => {
+    if (url && endpoint) {
+      setParams({ baseurl: url, endpoint: endpoint, method: requestType });
+      console.log('Endpoint:', endpoint);
+      console.log('Request Type:', requestType);
+    }
+  }, [url, endpoint, requestType]);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
+    <div>
+      <div className="InputHandler">
+        <select 
+          value={requestType} 
+          onChange={(e) => setRequestType(e.target.value)}
+          className="mb-4 p-2 border rounded"
         >
-          Learn React
-        </a>
-      </header>
+          <option value="GET">GET Request</option>
+          <option value="POST">POST Request</option>
+        </select>
+        <input 
+          type="text" 
+          ref={URLref} 
+          placeholder="Enter Base URL" 
+          className="mx-2 p-2 border rounded"
+        />
+        <input 
+          type="text" 
+          ref={endpointref} 
+          placeholder="Enter Endpoint" 
+          className="mx-2 p-2 border rounded"
+        />
+        <button 
+          onClick={handleRequest}
+          className="p-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+        >
+          Get Output
+        </button>
+      </div>
+      
+      {/* Conditionally render either GetTest or PostTest based on selection */}
+      {requestType === "GET" ? (
+        <GetTest params={params} />
+      ) : (
+        <PostTest params={params} />
+      )}
     </div>
   );
 }
